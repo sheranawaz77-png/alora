@@ -240,7 +240,7 @@ tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--surface2)}
 
       <!-- PRODUCTS -->
       <section class="view" id="view-products">
-        <div class="page-head"><div><h1>Products</h1><p>Catalogue matches the storefront fields — beds, sofas, mattresses and living-room furniture. Demo products.</p></div><button class="btn btn-primary" onclick="openProductModal()">+ Add product</button></div>
+        <div class="page-head"><div><h1>Products</h1><p>Catalogue matches the storefront fields — beds, sofas, mattresses and living-room furniture. Your edits save in this browser. They will appear on the live storefront once it is connected to a backend.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="resetDemoProducts()">↺ Reset demo data</button><button class="btn btn-primary" onclick="openProductModal()">+ Add product</button></div></div>
         <div class="card">
           <div class="filterbar"><input id="productSearch" placeholder="Search products, SKU…" oninput="renderProducts()"><select id="productCatFilter" onchange="renderProducts()"><option value="">All categories</option><option>Beds</option><option>Sofas</option><option>Mattresses</option><option>Bedroom</option><option>Living Room</option></select><select id="productStatusFilter" onchange="renderProducts()"><option value="">All statuses</option><option>Active</option><option>Draft</option><option>Low Stock</option><option>Out of Stock</option></select></div>
           <div class="table-wrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Price</th><th>Sale Price</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody id="productsTable"></tbody></table></div>
@@ -385,30 +385,39 @@ tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--surface2)}
 <!-- PRODUCT MODAL -->
 <div class="modal-overlay" id="productOverlay" onclick="closeProductModal()"></div>
 <div class="modal" id="productModal"><div class="modal-card">
-  <div style="padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><div><h3 style="margin:0;font-family:Fraunces,serif;font-size:22px" id="productModalTitle">Add product</h3><p style="margin:3px 0 0;color:var(--muted);font-size:13px">Same fields as the storefront — demo save only</p></div><button class="icon-btn" onclick="closeProductModal()">✕</button></div>
+  <div style="padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><div><h3 style="margin:0;font-family:Fraunces,serif;font-size:22px" id="productModalTitle">Add product</h3><p style="margin:3px 0 0;color:var(--muted);font-size:13px">Same fields as the storefront — changes save in this browser</p></div><button class="icon-btn" onclick="closeProductModal()">✕</button></div>
   <div style="padding:18px">
     <div class="form-grid">
       <div class="field"><label>Product name *</label><input id="pfName" value="Milano Ottoman Bed"/></div>
       <div class="field"><label>SKU</label><input id="pfSku" value="AD-BED-001"/></div>
       <div class="field"><label>Category</label><select id="pfCat"><option>Beds</option><option>Sofas</option><option>Mattresses</option><option>Bedroom</option><option>Living Room</option></select></div>
-      <div class="field"><label>Subcategory</label><select><option>Ottoman Beds</option><option>Divan Beds</option><option>Upholstered Beds</option><option>Corner Sofas</option><option>Sofa Beds</option><option>2 Seater Sofas</option></select></div>
+      <div class="field"><label>Subcategory</label><input id="pfSub" value="Ottoman Beds"/></div>
       <div class="field"><label>Price (£)</label><input id="pfPrice" value="649"/></div>
       <div class="field"><label>Sale price (£)</label><input id="pfSale" value="499"/></div>
       <div class="field"><label>Stock</label><input id="pfStock" value="14"/></div>
-      <div class="field"><label>Availability</label><select><option>In Stock</option><option>Low Stock</option><option>Out of Stock</option><option>Pre-order</option></select></div>
-      <div class="field full"><label>Short description</label><textarea>Upholstered ottoman bed with gas-lift storage — demo description.</textarea></div>
-      <div class="field full"><label>Full description</label><textarea style="min-height:110px">Detailed product description with materials, comfort and care information. Editable placeholder — replace with final copy before launch.</textarea></div>
-      <div class="field"><label>Width (cm)</label><input value="168"/></div><div class="field"><label>Height (cm)</label><input value="118"/></div>
-      <div class="field"><label>Depth (cm)</label><input value="218"/></div><div class="field"><label>Materials</label><input value="Chenille fabric, solid wood frame"/></div>
-      <div class="field"><label>Colours (comma separated)</label><input value="Oatmeal, Stone Grey, Sage"/></div>
-      <div class="field"><label>Sizes / Variants</label><input value="Single, Double, King, Super King"/></div>
-      <div class="field full"><label>Variant pricing note</label><input value="King +£80 • Super King +£140 (demo per-variant pricing)"/></div>
-      <div class="field"><label>Badges</label><select><option>SALE</option><option>BEST SELLER</option><option>NEW</option><option>LOW STOCK</option><option>None</option></select></div>
-      <div class="field"><label>Images / Gallery</label><input value="Upload images — demo uploader (JPG/WebP)"/></div>
-      <div class="field"><label>SEO title</label><input value="Milano Ottoman Bed | ALAURA Drift"/></div>
-      <div class="field"><label>SEO description</label><input value="Shop the Milano Ottoman Bed with storage. Free UK delivery on selected products."/></div>
+      <div class="field"><label>Status</label><select id="pfStatus"><option>Active</option><option>Low Stock</option><option>Out of Stock</option><option>Draft</option></select></div>
+      <div class="field full"><label>Short description</label><textarea id="pfShort">Upholstered ottoman bed with gas-lift storage — demo description.</textarea></div>
+      <div class="field full"><label>Full description</label><textarea id="pfFull" style="min-height:110px">Detailed product description with materials, comfort and care information. Editable placeholder — replace with final copy before launch.</textarea></div>
+      <div class="field"><label>Width (cm)</label><input id="pfWidth" value="168"/></div><div class="field"><label>Height (cm)</label><input id="pfHeight" value="118"/></div>
+      <div class="field"><label>Depth (cm)</label><input id="pfDepth" value="218"/></div><div class="field"><label>Materials</label><input id="pfMaterials" value="Chenille fabric, solid wood frame"/></div>
+      <div class="field"><label>Colours (comma separated)</label><input id="pfColours" value="Oatmeal, Stone Grey, Sage"/></div>
+      <div class="field"><label>Sizes / Variants</label><input id="pfVariants" value="Single, Double, King, Super King"/></div>
+      <div class="field full"><label>Variant pricing note</label><input id="pfVariantNote" value="King +£80 • Super King +£140 (demo per-variant pricing)"/></div>
+      <div class="field"><label>Badge</label><select id="pfBadge"><option value="">None</option><option>SALE</option><option>BEST SELLER</option><option>NEW</option><option>LOW STOCK</option></select></div>
+      <div class="field full"><label>Product image</label>
+        <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+          <img id="pfImg" src="" alt="Product image preview" style="width:120px;height:120px;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:var(--surface2)"/>
+          <div style="flex:1;min-width:200px;display:grid;gap:8px;align-content:start">
+            <input type="file" id="pfImgFile" accept="image/*" onchange="handleImageFile(this)" style="border:1px solid var(--line);border-radius:10px;padding:9px;font-size:13px"/>
+            <input id="pfImgUrl" placeholder="…or paste an image URL" oninput="pendingImage=this.value.trim();document.getElementById('pfImg').src=this.value.trim()||PLACEHOLDER_IMG"/>
+            <span style="font-size:11px;color:var(--muted)">Upload a photo (JPG / PNG / WebP — resized automatically) or paste an image link.</span>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label>SEO title</label><input id="pfSeoTitle" value="Milano Ottoman Bed | ALAURA Drift"/></div>
+      <div class="field"><label>SEO description</label><input id="pfSeoDesc" value="Shop the Milano Ottoman Bed with storage. Free UK delivery on selected products."/></div>
     </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap"><button class="btn" onclick="closeProductModal()">Cancel</button><button class="btn" onclick="showToast('Draft saved — demo')">Save as draft</button><button class="btn btn-primary" onclick="saveProductDemo()">Save product</button></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap"><button class="btn" id="pfDeleteBtn" style="color:var(--red);margin-right:auto" onclick="deleteEditingProduct()">Delete product</button><button class="btn" onclick="closeProductModal()">Cancel</button><button class="btn" onclick="document.getElementById('pfStatus').value='Draft';saveProduct()">Save as draft</button><button class="btn btn-primary" onclick="saveProduct()">Save product</button></div>
   </div>
 </div></div>
 
@@ -435,7 +444,7 @@ const orders = [
   {id:'AD-10477', customer:'Ethan Clarke (Demo)', email:'ethan.demo@example.com', date:'3 Oct 2026', items:1, total:449, pay:'Paid', fulfil:'Delivered', method:'Standard UK Delivery', address:'19 Station Road, Manchester, M14 6AB', phone:'07678 901234 (demo)', lines:[{name:'Nordic Bouclé Bed — Double', qty:1, price:449}], delivery:0, timeline:['Order placed — 28 Sep 2026','Payment confirmed','Processing','Shipped','Delivered — 2 Oct 2026']},
 ];
 
-const products = [
+let products = [
   {name:'Milano Ottoman Bed', sku:'AD-BED-001', cat:'Beds', sub:'Ottoman Beds', price:649, sale:499, stock:2, status:'Low Stock', img:'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=200&q=80', badge:'SALE'},
   {name:'Oslo Chenille Bed', sku:'AD-BED-014', cat:'Beds', sub:'Upholstered Beds', price:429, sale:329, stock:18, status:'Active', img:'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=200&q=80', badge:'BEST SELLER'},
   {name:'Verona Chesterfield Sofa', sku:'AD-SOF-009', cat:'Sofas', sub:'Chesterfield Sofas', price:2199, sale:1899, stock:6, status:'Active', img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&q=80', badge:''},
@@ -445,6 +454,33 @@ const products = [
   {name:'Hybrid Comfort Mattress — King', sku:'AD-MAT-005', cat:'Mattresses', sub:'Hybrid Mattresses', price:599, sale:449, stock:23, status:'Active', img:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=200&q=80', badge:'BEST SELLER'},
   {name:'Haven 3-Seater Sofa', sku:'AD-SOF-031', cat:'Sofas', sub:'3 Seater Sofas', price:899, sale:null, stock:9, status:'Draft', img:'https://images.unsplash.com/photo-1567016432779-094069958ea5?w=200&q=80', badge:''},
 ];
+// Stable ids for edit/delete, then browser persistence (localStorage)
+products.forEach((p,i)=>{ if(!p.id) p.id = p.sku || ('AD-'+i); });
+const DEFAULT_PRODUCTS = JSON.parse(JSON.stringify(products));
+const LS_PRODUCTS_KEY = 'alaura_drift_products_v1';
+(function initProducts(){
+  try{
+    const raw = localStorage.getItem(LS_PRODUCTS_KEY);
+    if(raw){ const arr = JSON.parse(raw);
+      if(Array.isArray(arr) && arr.length){
+        arr.forEach((p,i)=>{ if(!p.id) p.id = p.sku || ('AD-'+i); });
+        products = arr;
+      }
+    }
+  }catch(e){ /* storage unavailable — fall back to demo data */ }
+})();
+function saveProducts(){
+  try{ localStorage.setItem(LS_PRODUCTS_KEY, JSON.stringify(products)); return true; }
+  catch(e){ showToast('Could not save — browser storage is full. Try a smaller image.'); return false; }
+}
+function resetDemoProducts(){
+  if(!confirm('Reset all products to the original demo data? Your changes will be lost.')) return;
+  products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+  try{ localStorage.removeItem(LS_PRODUCTS_KEY); }catch(e){}
+  renderProducts(); renderInventory();
+  showToast('Products reset to demo data');
+}
+const PLACEHOLDER_IMG = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="#e9e2d6"/><text x="200" y="140" font-family="Georgia,serif" font-size="26" fill="#8a7d68" text-anchor="middle">ALAURA Drift</text><text x="200" y="170" font-family="Georgia,serif" font-size="13" fill="#a89a83" text-anchor="middle">No image yet</text></svg>');
 
 const categories = [
   {name:'Beds', parent:'—', count:18, status:'Active', desc:'Modern beds for beautiful bedrooms', subs:'Divan, Ottoman, Upholstered, Storage'},
@@ -502,7 +538,7 @@ function renderProducts(){
   const cat=document.getElementById('productCatFilter')?.value||'';
   const st=document.getElementById('productStatusFilter')?.value||'';
   const filtered=products.filter(p=>(!q||p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||p.status===st));
-  document.getElementById('productsTable').innerHTML = filtered.map((p,i)=>`<tr><td><div class="product-cell"><img class="thumb" src="${p.img}" alt="${p.name}"><div><b>${p.name}</b><span>${p.sub} ${p.badge? '• '+p.badge:''}</span></div></div></td><td style="font-family:ui-monospace,monospace;font-size:12px">${p.sku}</td><td>${p.cat}</td><td>${fmtGBP(p.price)}</td><td>${p.sale?fmtGBP(p.sale):'—'}</td><td><b style="color:${p.stock<=2?'var(--red)':p.stock<=5?'var(--amber)':'inherit'}">${p.stock}</b></td><td><span class="pill ${pillFor(p.status)}">${p.status}</span></td><td><button class="btn" style="padding:6px 10px" onclick="openProductModal(${i})">Edit</button></td></tr>`).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:22px">No products found.</td></tr>`;
+  document.getElementById('productsTable').innerHTML = filtered.map(p=>`<tr><td><div class="product-cell"><img class="thumb" src="${p.img||PLACEHOLDER_IMG}" alt="${p.name}"><div><b>${p.name}</b><span>${p.sub||''} ${p.badge? '• '+p.badge:''}</span></div></div></td><td style="font-family:ui-monospace,monospace;font-size:12px">${p.sku}</td><td>${p.cat}</td><td>${fmtGBP(p.price)}</td><td>${p.sale!=null?fmtGBP(p.sale):'—'}</td><td><b style="color:${p.stock<=2?'var(--red)':p.stock<=5?'var(--amber)':'inherit'}">${p.stock}</b></td><td><span class="pill ${pillFor(p.status)}">${p.status}</span></td><td style="white-space:nowrap"><button class="btn" style="padding:6px 10px" onclick="openProductModal('${p.id}')">Edit</button> <button class="btn" style="padding:6px 10px;color:var(--red)" onclick="deleteProduct('${p.id}')">Delete</button></td></tr>`).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:22px">No products found.</td></tr>`;
 }
 function renderCategories(){
   document.getElementById('categoriesGrid').innerHTML = categories.slice(0,6).map(c=>`<div class="card" style="padding:16px"><div style="display:flex;justify-content:space-between;gap:10px"><b>${c.name}</b><span class="pill pill-grey">${c.count} products</span></div><p style="color:var(--muted);font-size:13px;line-height:1.5;margin:8px 0">${c.desc}</p>${c.subs?`<div style="font-size:12px;color:var(--muted)">Subcategories: ${c.subs}</div>`:''}<div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="padding:7px 10px" onclick="showToast('Edit category — demo')">Edit</button><button class="btn" style="padding:7px 10px" onclick="switchView('products')">View products</button></div></div>`).join('');
@@ -516,11 +552,13 @@ function renderInventory(){
   if(f==='low') list=list.filter(p=>p.stock>0&&p.stock<=5);
   if(f==='out') list=list.filter(p=>p.stock===0);
   if(f==='ok') list=list.filter(p=>p.stock>5);
-  document.getElementById('inventoryTable').innerHTML = list.map((p,i)=>`<tr><td><div class="product-cell"><img class="thumb" src="${p.img}" alt=""><div><b>${p.name}</b><span>${p.cat} • ${p.sub}</span></div></div></td><td style="font-family:ui-monospace,monospace;font-size:12px">${p.sku}</td><td style="font-size:12px;color:var(--muted)">${p.warehouse}</td><td><b>${p.stock}</b></td><td>${p.reserved}</td><td><span class="pill ${p.stock===0?'pill-red':p.stock<=5?'pill-amber':'pill-green'}">${p.stock===0?'Out of stock':p.stock<=5?'Low stock':'In stock'}</span></td><td><div style="display:flex;gap:6px;align-items:center"><button class="btn" style="padding:6px 9px" onclick="adjustStock(${i},-1)">−</button><span style="min-width:22px;text-align:center;font-weight:700">${p.stock}</span><button class="btn" style="padding:6px 9px" onclick="adjustStock(${i},1)">+</button></div></td></tr>`).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No inventory matches.</td></tr>`;
+  document.getElementById('inventoryTable').innerHTML = list.map((p,i)=>`<tr><td><div class="product-cell"><img class="thumb" src="${p.img}" alt=""><div><b>${p.name}</b><span>${p.cat} • ${p.sub}</span></div></div></td><td style="font-family:ui-monospace,monospace;font-size:12px">${p.sku}</td><td style="font-size:12px;color:var(--muted)">${p.warehouse}</td><td><b>${p.stock}</b></td><td>${p.reserved}</td><td><span class="pill ${p.stock===0?'pill-red':p.stock<=5?'pill-amber':'pill-green'}">${p.stock===0?'Out of stock':p.stock<=5?'Low stock':'In stock'}</span></td><td><div style="display:flex;gap:6px;align-items:center"><button class="btn" style="padding:6px 9px" onclick="adjustStock('${p.id}',-1)">−</button><span style="min-width:22px;text-align:center;font-weight:700">${p.stock}</span><button class="btn" style="padding:6px 9px" onclick="adjustStock('${p.id}',1)">+</button></div></td></tr>`).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No inventory matches.</td></tr>`;
 }
-function adjustStock(idx,delta){
-  // demo only — find by rendered order is approximate; just toast
-  showToast(delta>0?'Stock increased by 1 — demo':'Stock decreased by 1 — demo');
+function adjustStock(id,delta){
+  const p=products.find(x=>x.id===id); if(!p) return;
+  p.stock=Math.max(0,(parseInt(p.stock,10)||0)+delta);
+  if(saveProducts()){ renderInventory(); renderProducts(); }
+  showToast(delta>0?'Stock increased by 1':'Stock decreased by 1');
 }
 function renderCustomers(){
   const q=(document.getElementById('custSearch')?.value||'').toLowerCase();
@@ -588,14 +626,121 @@ function openCustomer(idx){
   document.getElementById('orderDrawer').classList.add('open');
 }
 
-// PRODUCT MODAL
-function openProductModal(idx){
-  if(typeof idx==='number'){ const p=products[idx]; document.getElementById('productModalTitle').textContent='Edit product'; document.getElementById('pfName').value=p.name; document.getElementById('pfSku').value=p.sku; document.getElementById('pfPrice').value=p.price; document.getElementById('pfSale').value=p.sale||''; document.getElementById('pfStock').value=p.stock; }
-  else { document.getElementById('productModalTitle').textContent='Add product'; }
+// PRODUCT MODAL — working product manager (add / edit / delete / images), saved in this browser
+let editingId = null;
+let pendingImage = null;
+function setPf(id,val){ const el=document.getElementById(id); if(el) el.value=(val==null?'':val); }
+function openProductModal(id){
+  const pfImg=document.getElementById('pfImg'), pfImgUrl=document.getElementById('pfImgUrl'), pfImgFile=document.getElementById('pfImgFile');
+  if(id){
+    const p=products.find(x=>x.id===id); if(!p) return;
+    editingId=id;
+    document.getElementById('productModalTitle').textContent='Edit product';
+    setPf('pfName',p.name); setPf('pfSku',p.sku); setPf('pfCat',p.cat); setPf('pfSub',p.sub);
+    setPf('pfPrice',p.price); setPf('pfSale',p.sale); setPf('pfStock',p.stock);
+    setPf('pfStatus',p.status); setPf('pfBadge',p.badge||'');
+    setPf('pfShort',p.short); setPf('pfFull',p.full);
+    setPf('pfWidth',p.width); setPf('pfHeight',p.height); setPf('pfDepth',p.depth);
+    setPf('pfMaterials',p.materials); setPf('pfColours',p.colours); setPf('pfVariants',p.variants);
+    setPf('pfVariantNote',p.variantNote); setPf('pfSeoTitle',p.seoTitle); setPf('pfSeoDesc',p.seoDesc);
+    pendingImage = p.img || null;
+    pfImg.src = p.img || PLACEHOLDER_IMG;
+    pfImgUrl.value = (p.img && !p.img.startsWith('data:')) ? p.img : '';
+    pfImgFile.value='';
+    document.getElementById('pfDeleteBtn').style.display='';
+  } else {
+    editingId=null;
+    document.getElementById('productModalTitle').textContent='Add product';
+    setPf('pfName',''); setPf('pfSku',''); setPf('pfSub','');
+    setPf('pfPrice',''); setPf('pfSale',''); setPf('pfStock','');
+    setPf('pfShort',''); setPf('pfFull','');
+    setPf('pfWidth',''); setPf('pfHeight',''); setPf('pfDepth','');
+    setPf('pfMaterials',''); setPf('pfColours',''); setPf('pfVariants','');
+    setPf('pfVariantNote',''); setPf('pfSeoTitle',''); setPf('pfSeoDesc','');
+    document.getElementById('pfCat').value='Beds';
+    document.getElementById('pfStatus').value='Active';
+    document.getElementById('pfBadge').value='';
+    pendingImage=null; pfImg.src=PLACEHOLDER_IMG; pfImgUrl.value=''; pfImgFile.value='';
+    document.getElementById('pfDeleteBtn').style.display='none';
+  }
   document.getElementById('productOverlay').classList.add('open'); document.getElementById('productModal').classList.add('open');
 }
 function closeProductModal(){ document.getElementById('productOverlay').classList.remove('open'); document.getElementById('productModal').classList.remove('open'); }
-function saveProductDemo(){ closeProductModal(); showToast('Product saved — demo (would publish to storefront)'); renderProducts(); }
+function handleImageFile(input){
+  const f=input.files && input.files[0]; if(!f) return;
+  if(!f.type.startsWith('image/')){ showToast('Please choose an image file (JPG, PNG or WebP).'); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1000, scale=Math.min(1,max/Math.max(img.width,img.height));
+      const w=Math.max(1,Math.round(img.width*scale)), h=Math.max(1,Math.round(img.height*scale));
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      pendingImage=c.toDataURL('image/jpeg',0.82);
+      document.getElementById('pfImg').src=pendingImage;
+      document.getElementById('pfImgUrl').value='';
+      showToast('Image added — preview updated');
+    };
+    img.onerror=()=>showToast('Could not read that image.');
+    img.src=e.target.result;
+  };
+  reader.onerror=()=>showToast('Could not read that file.');
+  reader.readAsDataURL(f);
+}
+function saveProduct(){
+  const name=document.getElementById('pfName').value.trim();
+  const price=parseFloat(document.getElementById('pfPrice').value);
+  if(!name){ showToast('Please enter a product name.'); document.getElementById('pfName').focus(); return; }
+  if(isNaN(price)||price<0){ showToast('Please enter a valid price (£).'); document.getElementById('pfPrice').focus(); return; }
+  const saleRaw=document.getElementById('pfSale').value.trim();
+  const saleParsed=parseFloat(saleRaw);
+  const stockRaw=parseInt(document.getElementById('pfStock').value,10);
+  const img=pendingImage || document.getElementById('pfImgUrl').value.trim() || PLACEHOLDER_IMG;
+  const data={
+    name: name,
+    sku: document.getElementById('pfSku').value.trim() || ('AD-'+Math.random().toString(36).slice(2,7).toUpperCase()),
+    cat: document.getElementById('pfCat').value,
+    sub: document.getElementById('pfSub').value.trim(),
+    price: price,
+    sale: (saleRaw===''||isNaN(saleParsed)) ? null : saleParsed,
+    stock: isNaN(stockRaw) ? 0 : Math.max(0,stockRaw),
+    status: document.getElementById('pfStatus').value,
+    badge: document.getElementById('pfBadge').value,
+    img: img,
+    short: document.getElementById('pfShort').value.trim(),
+    full: document.getElementById('pfFull').value.trim(),
+    width: document.getElementById('pfWidth').value.trim(),
+    height: document.getElementById('pfHeight').value.trim(),
+    depth: document.getElementById('pfDepth').value.trim(),
+    materials: document.getElementById('pfMaterials').value.trim(),
+    colours: document.getElementById('pfColours').value.trim(),
+    variants: document.getElementById('pfVariants').value.trim(),
+    variantNote: document.getElementById('pfVariantNote').value.trim(),
+    seoTitle: document.getElementById('pfSeoTitle').value.trim(),
+    seoDesc: document.getElementById('pfSeoDesc').value.trim()
+  };
+  if(editingId){
+    const p=products.find(x=>x.id===editingId);
+    if(p) Object.assign(p,data);
+    showToast('Product updated');
+  } else {
+    data.id='p'+Date.now().toString(36);
+    products.unshift(data);
+    showToast('Product added');
+  }
+  if(saveProducts()){ renderProducts(); renderInventory(); }
+  closeProductModal();
+}
+function deleteProduct(id){
+  const p=products.find(x=>x.id===id); if(!p) return;
+  if(!confirm('Delete "'+p.name+'"? This cannot be undone.')) return;
+  products=products.filter(x=>x.id!==id);
+  closeProductModal();
+  if(saveProducts()){ renderProducts(); renderInventory(); }
+  showToast('Product deleted');
+}
+function deleteEditingProduct(){ if(editingId) deleteProduct(editingId); }
 function openDiscountModal(){ document.getElementById('discountOverlay').classList.add('open'); document.getElementById('discountModal').classList.add('open'); }
 function closeDiscountModal(){ document.getElementById('discountOverlay').classList.remove('open'); document.getElementById('discountModal').classList.remove('open'); }
 function toggleSwitch(el){ el.classList.toggle('on'); showToast(el.classList.contains('on')?'Setting enabled — demo':'Setting disabled — demo'); }
