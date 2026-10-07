@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="light dark"/>
+<link rel="icon" href="data:,">
+<title>ALAURA Drift — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF9F6; --surface:#FFFFFF; --surface2:#F3EEE7; --surface3:#EDE6DB;
+  --line:#E6DDD1; --line2:#EFE9DF;
+  --text:#221E1B; --muted:#7A746E; --muted2:#A99E93;
+  --taupe:#8C7A6B; --taupe-dark:#6B5D4F; --charcoal:#2B2724;
+  --accent:#8C7A6B; --accent-bg:#F3EEE7;
+  --sage:#7A8A6E; --sage-bg:#EEF3EA; --amber:#B7791F; --amber-bg:#FEF3C7;
+  --red:#B45338; --red-bg:#FEF0EC; --green:#3F7A4A; --green-bg:#E8F3E9;
+  --radius:16px; --radius-sm:10px;
+  --shadow:0 1px 3px rgba(34,30,27,.06),0 8px 24px rgba(34,30,27,.04);
+  --shadow-lg:0 12px 40px rgba(34,30,27,.12);
+}
+@media(prefers-color-scheme:dark){
+  :root{ --bg:#1C1917; --surface:#25211E; --surface2:#2E2A26; --surface3:#38322C; --line:#3A342E; --line2:#322D28; --text:#F2EDE8; --muted:#A99E93; --muted2:#7A7168; --accent-bg:#2E2A26; --sage-bg:#2A3328; --red-bg:#3A2A26; --green-bg:#253329; }
+}
+*{box-sizing:border-box} body{margin:0;font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+a{color:inherit} button,input,select,textarea{font:inherit}
+.app{display:flex;min-height:100vh}
+/* SIDEBAR */
+.sidebar{width:264px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:40;transition:transform .25s ease}
+.sidebar-head{padding:20px 20px 16px;border-bottom:1px solid var(--line2)}
+.logo{font-family:"Fraunces",serif;font-weight:600;font-size:22px;letter-spacing:.02em;line-height:1}
+.logo small{display:block;font-family:"DM Sans",sans-serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:5px}
+.demo-pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:600;color:var(--taupe-dark);margin-top:12px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--sage);display:inline-block}
+.nav{padding:14px 12px;flex:1;overflow:auto}
+.nav-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);font-weight:700;padding:12px 10px 7px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:500;font-size:14px;border:1px solid transparent;margin-bottom:2px;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--charcoal);color:#fff}
+.nav-item.active .nav-icon{opacity:1}
+.nav-icon{width:18px;text-align:center;font-size:15px}
+.nav-badge{margin-left:auto;background:var(--surface3);color:var(--taupe-dark);font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px}
+.nav-item.active .nav-badge{background:rgba(255,255,255,.18);color:#fff}
+.sidebar-foot{padding:14px;border-top:1px solid var(--line2)}
+.store-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.store-card b{font-size:13px} .store-card p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.4}
+/* MAIN */
+.main{flex:1;margin-left:264px;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 22px;display:flex;align-items:center;gap:14px}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.icon-btn:hover{background:var(--surface2)}
+.searchbar{flex:1;max-width:520px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:0 14px;height:42px}
+.searchbar input{border:0;outline:0;background:transparent;width:100%;color:var(--text)}
+.searchbar input::placeholder{color:var(--muted2)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--charcoal);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.profile{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px}
+.profile b{font-size:13px;line-height:1.1;display:block} .profile span{font-size:11px;color:var(--muted);display:block}
+.content{padding:22px;max-width:1280px;width:100%;margin:0 auto}
+.page-head{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.page-head h1{font-family:"Fraunces",serif;font-size:32px;line-height:1;margin:0;font-weight:600;letter-spacing:-.01em}
+.page-head p{margin:6px 0 0;color:var(--muted);font-size:14px;max-width:620px;line-height:1.5}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);padding:10px 14px;border-radius:999px;font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{background:var(--surface2)}
+.btn-primary{background:var(--charcoal);color:#fff;border-color:var(--charcoal)}
+.btn-primary:hover{background:#3a3531}
+.btn-ghost{border-color:transparent;background:transparent}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.kpi{padding:18px}
+.kpi-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.kpi-value{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:8px}
+.kpi-sub{margin-top:6px;font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.trend{font-weight:700;padding:3px 7px;border-radius:999px;font-size:11px}
+.trend.up{background:var(--green-bg);color:var(--green)} .trend.down{background:var(--red-bg);color:var(--red)}
+.grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.section-title{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 0}
+.section-title h3{margin:0;font-size:15px} .section-title p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:13px 14px;border-bottom:1px solid var(--line2);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--surface2)}
+.pill{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.pill-green{background:var(--green-bg);color:var(--green)} .pill-amber{background:var(--amber-bg);color:var(--amber)} .pill-red{background:var(--red-bg);color:var(--red)} .pill-grey{background:var(--surface2);color:var(--muted)} .pill-char{background:var(--charcoal);color:#fff}
+.filterbar{display:flex;flex-wrap:wrap;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line2)}
+.filterbar input,.filterbar select{height:38px;border:1px solid var(--line);border-radius:999px;padding:0 12px;background:var(--surface);color:var(--text);outline:0}
+.filterbar input{flex:1;min-width:180px}
+.thumb{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--surface2);border:1px solid var(--line)}
+.product-cell{display:flex;gap:10px;align-items:center;min-width:200px}
+.product-cell b{font-size:13px;line-height:1.2;display:block} .product-cell span{font-size:11px;color:var(--muted)}
+.alert{display:flex;gap:11px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.alert + .alert{margin-top:9px}
+.alert-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:var(--surface);color:var(--text);outline:0}
+.field textarea{min-height:76px;resize:vertical}
+.field.full{grid-column:1/-1}
+.toggle{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line2)}
+.toggle:last-child{border-bottom:0}
+.switch{width:44px;height:24px;border-radius:999px;background:var(--surface3);position:relative;cursor:pointer;flex-shrink:0;border:1px solid var(--line)}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+.switch.on{background:var(--charcoal)} .switch.on::after{left:22px}
+.drawer-overlay,.modal-overlay{position:fixed;inset:0;background:rgba(28,25,23,.45);z-index:60;opacity:0;pointer-events:none;transition:.2s;visibility:hidden}
+.drawer-overlay.open,.modal-overlay.open{opacity:1;pointer-events:auto;visibility:visible}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100vw);background:var(--surface);z-index:61;transform:translateX(102%);transition:.28s ease;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);visibility:hidden}
+.drawer.open{transform:none;visibility:visible}
+.drawer-head{padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.drawer-body{padding:18px;overflow:auto;flex:1}
+.modal{position:fixed;inset:0;z-index:61;display:grid;place-items:center;padding:16px;pointer-events:none;visibility:hidden}
+.modal.open{visibility:visible}
+.modal-card{width:min(860px,100%);max-height:92vh;overflow:auto;background:var(--surface);border-radius:20px;border:1px solid var(--line);box-shadow:var(--shadow-lg);opacity:0;transform:translateY(8px) scale(.99);transition:.2s}
+.modal.open .modal-card{opacity:1;transform:none;pointer-events:auto}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl{display:flex;gap:12px}
+.tl-dot{width:22px;display:flex;flex-direction:column;align-items:center}
+.tl-dot span{width:10px;height:10px;border-radius:50%;background:var(--surface3);border:2px solid var(--line);margin-top:4px}
+.tl-dot.done span{background:var(--charcoal);border-color:var(--charcoal)}
+.tl-line{width:2px;flex:1;background:var(--line);margin:4px 0}
+.stars{color:#C9A86A;letter-spacing:1px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);background:var(--charcoal);color:#fff;padding:11px 14px;border-radius:999px;font-size:13px;font-weight:600;z-index:90;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow-lg);max-width:calc(100vw - 24px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.view{display:none} .view.active{display:block}
+.mobile-menu{display:none}
+.scrim{display:none}
+@media(max-width:1020px){ .kpis{grid-template-columns:repeat(2,1fr)} .grid2,.grid3{grid-template-columns:1fr} }
+@media(max-width:760px){
+  .sidebar{transform:translateX(-105%)} .sidebar.open{transform:none;box-shadow:var(--shadow-lg)}
+  .main{margin-left:0} .content{padding:14px} .topbar{padding:10px 12px}
+  .mobile-menu{display:grid} .profile b,.profile span{display:none} .profile{padding:4px}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px} .kpi{padding:14px} .kpi-value{font-size:22px}
+  .page-head h1{font-size:26px} .form-grid{grid-template-columns:1fr}
+  .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:39;opacity:0;pointer-events:none;transition:.2s}
+  .scrim.open{opacity:1;pointer-events:auto}
+  table{min-width:620px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="scrim" id="scrim" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="logo">ALAURA Drift<small>Admin Dashboard</small></div>
+      <div class="demo-pill"><span class="dot"></span> Demo data — front-end prototype</div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" data-view="overview"><span class="nav-icon">◈</span> Overview</div>
+      <div class="nav-item" data-view="orders"><span class="nav-icon">▣</span> Orders <span class="nav-badge">24</span></div>
+      <div class="nav-item" data-view="products"><span class="nav-icon">▦</span> Products <span class="nav-badge">48</span></div>
+      <div class="nav-item" data-view="categories"><span class="nav-icon">☰</span> Categories</div>
+      <div class="nav-item" data-view="inventory"><span class="nav-icon">⬢</span> Inventory <span class="nav-badge">5 low</span></div>
+      <div class="nav-label">Customers</div>
+      <div class="nav-item" data-view="customers"><span class="nav-icon">◎</span> Customers</div>
+      <div class="nav-item" data-view="reviews"><span class="nav-icon">★</span> Reviews <span class="nav-badge">6 pending</span></div>
+      <div class="nav-label">Store</div>
+      <div class="nav-item" data-view="discounts"><span class="nav-icon">%</span> Discounts</div>
+      <div class="nav-item" data-view="delivery"><span class="nav-icon">⬣</span> Delivery Settings</div>
+      <div class="nav-item" data-view="content"><span class="nav-icon">✎</span> Content (CMS)</div>
+      <div class="nav-item" data-view="settings"><span class="nav-icon">⚙</span> Settings</div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="store-card"><b>ALAURA Drift — UK Store</b><p>Currency GBP (£) • VAT included where shown • Demo catalogue</p></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn mobile-menu" onclick="openSidebar()" aria-label="Open menu">☰</button>
+      <div class="searchbar"><span style="color:var(--muted)">⌕</span><input id="globalSearch" placeholder="Search orders, products, customers… (demo search)"/></div>
+      <div class="top-actions">
+        <button class="icon-btn" style="position:relative" onclick="showToast('3 new notifications — demo')" aria-label="Notifications">🔔<span style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-weight:700">3</span></button>
+        <div class="profile"><div class="avatar">AD</div><div><b>Store Owner</b><span>Admin • alaura-drift.co.uk</span></div><span style="color:var(--muted);font-size:18px">⌄</span></div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- OVERVIEW -->
+      <section class="view active" id="view-overview">
+        <div class="page-head"><div><h1>Overview</h1><p>Welcome back. Here’s what’s happening at ALAURA Drift today — all figures are clearly labelled demo data for this prototype.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="showToast('Report export — demo only')">↓ Export report</button><button class="btn btn-primary" onclick="switchView('products')">+ Add product</button></div></div>
+
+        <div class="kpis">
+          <div class="card kpi"><div class="kpi-label">Total Revenue</div><div class="kpi-value">£48,290</div><div class="kpi-sub"><span class="trend up">↑ 12.4%</span> vs previous 30 days • demo</div></div>
+          <div class="card kpi"><div class="kpi-label">Orders</div><div class="kpi-value">186</div><div class="kpi-sub"><span class="trend up">↑ 8.1%</span> 24 awaiting fulfilment</div></div>
+          <div class="card kpi"><div class="kpi-label">Average Order Value</div><div class="kpi-value">£259.62</div><div class="kpi-sub"><span class="trend up">↑ 3.2%</span> beds & sofas driving AOV</div></div>
+          <div class="card kpi"><div class="kpi-label">Conversion Rate</div><div class="kpi-value">2.84%</div><div class="kpi-sub"><span class="trend down">↓ 0.12%</span> mobile traffic up 18%</div></div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="section-title"><div><h3>Revenue — last 30 days</h3><p>Demo data • GBP (£) • Updated 7 Oct 2026</p></div><span class="pill pill-grey">Last 30 days ▾</span></div>
+            <div style="padding:8px 14px 14px">
+              <svg viewBox="0 0 680 220" width="100%" height="210" role="img" aria-label="Revenue chart last 30 days demo">
+                <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C7A6B" stop-opacity=".28"/><stop offset="100%" stop-color="#8C7A6B" stop-opacity="0"/></linearGradient></defs>
+                <g stroke="#E6DDD1" stroke-width="1"><line x1="36" y1="30" x2="660" y2="30"/><line x1="36" y1="80" x2="660" y2="80"/><line x1="36" y1="130" x2="660" y2="130"/><line x1="36" y1="180" x2="660" y2="180"/></g>
+                <path d="M36,168 C90,150 120,138 170,142 C220,146 250,110 300,104 C350,98 380,122 430,92 C480,62 530,78 580,58 C620,42 640,36 660,30 L660,190 L36,190 Z" fill="url(#g)"/>
+                <path d="M36,168 C90,150 120,138 170,142 C220,146 250,110 300,104 C350,98 380,122 430,92 C480,62 530,78 580,58 C620,42 640,36 660,30" fill="none" stroke="#6B5D4F" stroke-width="2.6" stroke-linecap="round"/>
+                <g fill="#6B5D4F"><circle cx="430" cy="92" r="4"/><circle cx="580" cy="58" r="4"/></g>
+                <g font-size="11" fill="#7A746E"><text x="36" y="206">7 Sep</text><text x="300" y="206">22 Sep</text><text x="600" y="206">7 Oct</text><text x="4" y="34">£2k</text><text x="4" y="134">£1k</text></g>
+              </svg>
+              <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill pill-grey">Peak: £2,000 — 7 Oct</span><span class="pill pill-grey">Beds 46% of revenue</span><span class="pill pill-grey">Sofas 38%</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-title"><div><h3>Low-stock alerts</h3><p>Action needed — demo inventory</p></div><button class="btn" style="padding:7px 10px" onclick="switchView('inventory')">View all</button></div>
+            <div style="padding:14px 18px 18px">
+              <div class="alert"><div class="alert-icon" style="background:var(--red-bg)">⚠</div><div style="flex:1"><b style="font-size:13px">Milano Ottoman Bed — King</b><div style="font-size:12px;color:var(--muted)">Only 2 left • SKU AD-BED-001-K</div></div><span class="pill pill-red">Low stock</span></div>
+              <div class="alert"><div class="alert-icon" style="background:var(--amber-bg)">◐</div><div style="flex:1"><b style="font-size:13px">Luna Corner Sofa — Left Hand</b><div style="font-size:12px;color:var(--muted)">4 left • Reorder point 5</div></div><span class="pill pill-amber">Reorder soon</span></div>
+              <div class="alert"><div class="alert-icon" style="background:var(--surface2)">▦</div><div style="flex:1"><b style="font-size:13px">Nordic Bouclé Bed — Double</b><div style="font-size:12px;color:var(--muted)">Out of stock • 12 on backorder list</div></div><span class="pill pill-grey">Out of stock</span></div>
+              <button class="btn" style="width:100%;justify-content:center;margin-top:12px" onclick="switchView('inventory')">Manage inventory →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="section-title"><div><h3>Recent orders</h3><p>Demo orders • Click a row to view details</p></div><button class="btn" onclick="switchView('orders')">View all orders →</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Fulfilment</th></tr></thead><tbody id="overviewOrders"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="view" id="view-orders">
+        <div class="page-head"><div><h1>Orders</h1><p>Demo orders only — no real customer data. Click any order to open the details drawer with address, timeline and actions.</p></div><button class="btn" onclick="showToast('Order export — demo')">↓ Export orders</button></div>
+        <div class="card">
+          <div class="filterbar"><input id="orderSearch" placeholder="Search by order number or customer…" oninput="renderOrders()"><select id="orderStatusFilter" onchange="renderOrders()"><option value="">All fulfilment statuses</option><option>Pending</option><option>Processing</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select><select><option>Last 30 days</option><option>Last 7 days</option><option>All time (demo)</option></select></div>
+          <div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Fulfilment</th><th></th></tr></thead><tbody id="ordersTable"></tbody></table></div>
+          <div style="padding:12px 18px;color:var(--muted);font-size:12px" id="ordersCount"></div>
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section class="view" id="view-products">
+        <div class="page-head"><div><h1>Products</h1><p>Catalogue matches the storefront fields — beds, sofas, mattresses and living-room furniture. Demo products.</p></div><button class="btn btn-primary" onclick="openProductModal()">+ Add product</button></div>
+        <div class="card">
+          <div class="filterbar"><input id="productSearch" placeholder="Search products, SKU…" oninput="renderProducts()"><select id="productCatFilter" onchange="renderProducts()"><option value="">All categories</option><option>Beds</option><option>Sofas</option><option>Mattresses</option><option>Bedroom</option><option>Living Room</option></select><select id="productStatusFilter" onchange="renderProducts()"><option value="">All statuses</option><option>Active</option><option>Draft</option><option>Low Stock</option><option>Out of Stock</option></select></div>
+          <div class="table-wrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Price</th><th>Sale Price</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody id="productsTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- CATEGORIES -->
+      <section class="view" id="view-categories">
+        <div class="page-head"><div><h1>Categories</h1><p>Manage the same category structure used on the storefront. Counts are demo.</p></div><button class="btn btn-primary" onclick="showToast('Add category — demo form would open here')">+ Add category</button></div>
+        <div class="grid3" id="categoriesGrid"></div>
+        <div class="card" style="margin-top:14px"><div class="section-title"><div><h3>All categories & subcategories</h3><p>Drag to reorder in a live CMS — here shown as an editable list (demo).</p></div></div><div class="table-wrap"><table><thead><tr><th>Category</th><th>Parent</th><th>Products</th><th>Status</th><th>Actions</th></tr></thead><tbody id="categoriesTable"></tbody></table></div></div>
+      </section>
+
+      <!-- INVENTORY -->
+      <section class="view" id="view-inventory">
+        <div class="page-head"><div><h1>Inventory</h1><p>Stock levels with low-stock warnings and quick adjustments. Demo stock figures.</p></div><button class="btn" onclick="showToast('Inventory export — demo')">↓ Export CSV</button></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px" class="inv-stats">
+          <div class="card" style="padding:16px"><div class="kpi-label">In stock SKUs</div><div style="font-size:24px;font-weight:700;margin-top:6px">41</div><div style="font-size:12px;color:var(--muted)">Across 48 products</div></div>
+          <div class="card" style="padding:16px;border-color:#F3D48A"><div class="kpi-label">Low stock (≤5)</div><div style="font-size:24px;font-weight:700;margin-top:6px;color:var(--amber)">5 items</div><div style="font-size:12px;color:var(--muted)">Reorder recommended</div></div>
+          <div class="card" style="padding:16px"><div class="kpi-label">Out of stock</div><div style="font-size:24px;font-weight:700;margin-top:6px;color:var(--red)">2 items</div><div style="font-size:12px;color:var(--muted)">Hidden or backorder on storefront</div></div>
+        </div>
+        <div class="card"><div class="filterbar"><input placeholder="Search SKU or product…" id="invSearch" oninput="renderInventory()"><select id="invFilter" onchange="renderInventory()"><option value="">All stock levels</option><option value="low">Low stock</option><option value="out">Out of stock</option><option value="ok">In stock</option></select></div><div class="table-wrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Warehouse</th><th>Available</th><th>Reserved</th><th>Status</th><th>Adjust stock</th></tr></thead><tbody id="inventoryTable"></tbody></table></div></div>
+      </section>
+
+      <!-- CUSTOMERS -->
+      <section class="view" id="view-customers">
+        <div class="page-head"><div><h1>Customers</h1><p>Demo customer records only — illustrative names and emails. Click a customer for order history.</p></div><button class="btn" onclick="showToast('Customer export — demo')">↓ Export</button></div>
+        <div class="card"><div class="filterbar"><input id="custSearch" placeholder="Search customers…" oninput="renderCustomers()"></div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Total spent</th><th>Last order</th><th>Status</th></tr></thead><tbody id="customersTable"></tbody></table></div></div>
+      </section>
+
+      <!-- REVIEWS -->
+      <section class="view" id="view-reviews">
+        <div class="page-head"><div><h1>Reviews</h1><p>Moderation queue — demo reviews. Approve, reject or reply before they appear on product pages.</p></div><span class="pill pill-amber">6 awaiting moderation</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="btn btn-primary" style="padding:8px 12px">All (12)</button><button class="btn" style="padding:8px 12px">Pending (6)</button><button class="btn" style="padding:8px 12px">Approved (4)</button><button class="btn" style="padding:8px 12px">Rejected (2)</button></div>
+        <div id="reviewsList" style="display:grid;gap:12px"></div>
+      </section>
+
+      <!-- DISCOUNTS -->
+      <section class="view" id="view-discounts">
+        <div class="page-head"><div><h1>Discounts</h1><p>Create percentage or fixed-amount codes with usage limits and expiry dates. Demo codes.</p></div><button class="btn btn-primary" onclick="openDiscountModal()">+ Create discount</button></div>
+        <div class="card"><div class="table-wrap"><table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Usage</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody id="discountsTable"></tbody></table></div></div>
+      </section>
+
+      <!-- DELIVERY -->
+      <section class="view" id="view-delivery">
+        <div class="page-head"><div><h1>Delivery Settings</h1><p>UK delivery zones, costs and timeframes shown on the storefront. All fields editable — demo values.</p></div><button class="btn btn-primary" onclick="showToast('Delivery settings saved — demo')">Save changes</button></div>
+        <div class="grid2">
+          <div class="card" style="padding:18px">
+            <h3 style="margin:0 0 4px">Delivery zones & pricing</h3><p style="margin:0;color:var(--muted);font-size:13px">GBP (£) • Prices include VAT where applicable</p>
+            <div style="display:grid;gap:10px;margin-top:14px" id="zones"></div>
+            <button class="btn" style="margin-top:12px" onclick="showToast('Add zone — demo')">+ Add zone</button>
+          </div>
+          <div class="card" style="padding:18px">
+            <h3 style="margin:0 0 4px">Services</h3><p style="margin:0;color:var(--muted);font-size:13px">Toggle services on/off for checkout</p>
+            <div class="toggle"><div><b style="font-size:13px">Room of choice delivery</b><div style="font-size:12px;color:var(--muted)">Two-person delivery to room of choice</div></div><div class="switch on" onclick="toggleSwitch(this)"></div></div>
+            <div class="toggle"><div><b style="font-size:13px">Assembly service</b><div style="font-size:12px;color:var(--muted)">Bed & sofa assembly at delivery</div></div><div class="switch on" onclick="toggleSwitch(this)"></div></div>
+            <div class="toggle"><div><b style="font-size:13px">Old furniture removal</b><div style="font-size:12px;color:var(--muted)">Like-for-like removal & recycling</div></div><div class="switch" onclick="toggleSwitch(this)"></div></div>
+            <div class="toggle"><div><b style="font-size:13px">Named day delivery</b><div style="font-size:12px;color:var(--muted)">Customer chooses delivery date at checkout</div></div><div class="switch on" onclick="toggleSwitch(this)"></div></div>
+            <div style="margin-top:14px"><label style="font-size:12px;font-weight:700">Default timeframe (working days)</label><input value="3–5 working days" style="width:100%;margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:10px"/></div>
+            <div style="margin-top:10px"><label style="font-size:12px;font-weight:700">Free delivery threshold</label><div style="display:flex;gap:8px;margin-top:6px"><span style="display:grid;place-items:center;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface2)">£</span><input value="499" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:10px"/></div><p style="font-size:12px;color:var(--muted)">Free UK delivery on selected products over this amount (demo).</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTENT CMS -->
+      <section class="view" id="view-content">
+        <div class="page-head"><div><h1>Content (CMS)</h1><p>Edit the exact text customers see on the storefront. Changes here are demo — in production they would publish live.</p></div><button class="btn btn-primary" onclick="showToast('Content saved — demo preview updated')">Save & preview</button></div>
+
+        <div class="card" style="padding:18px;margin-bottom:14px"><h3 style="margin:0">Announcement bar & Hero</h3><p style="color:var(--muted);font-size:13px;margin:4px 0 14px">Shown across the top of every page and on the homepage hero.</p>
+          <div class="form-grid">
+            <div class="field full"><label>Announcement bar text</label><input id="cmsAnnouncement" value="FREE UK DELIVERY ON SELECTED PRODUCTS"/></div>
+            <div class="field full"><label>Hero headline</label><input value="Furniture Made for Living"/></div>
+            <div class="field full"><label>Hero subheading</label><textarea>Discover stylish beds and sofas designed to bring comfort and character to your home.</textarea></div>
+            <div class="field"><label>Primary CTA text</label><input value="SHOP BEDS"/></div>
+            <div class="field"><label>Secondary CTA text</label><input value="SHOP SOFAS"/></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card" style="padding:18px"><h3 style="margin:0">Promotional banner</h3><p style="color:var(--muted);font-size:13px">Homepage sale section — editable discount and copy.</p>
+            <div class="form-grid" style="margin-top:12px"><div class="field full"><label>Banner headline</label><input value="Make Your Home More Comfortable"/></div><div class="field full"><label>Banner subheading</label><input value="Discover selected furniture at exceptional prices."/></div><div class="field"><label>Discount label</label><input value="Up to 30% off selected beds"/></div><div class="field"><label>CTA text</label><input value="SHOP SALE"/></div></div>
+          </div>
+          <div class="card" style="padding:18px"><h3 style="margin:0">Trust / benefits bar</h3><p style="color:var(--muted);font-size:13px">Four items shown under the hero.</p>
+            <div style="display:grid;gap:8px;margin-top:12px"><input value="UK-WIDE DELIVERY — Furniture delivered across the UK." style="border:1px solid var(--line);border-radius:10px;padding:10px"/><input value="QUALITY FURNITURE — Designed for comfort and everyday living." style="border:1px solid var(--line);border-radius:10px;padding:10px"/><input value="SECURE PAYMENTS — Safe and secure online checkout." style="border:1px solid var(--line);border-radius:10px;padding:10px"/><input value="CUSTOMER SUPPORT — Friendly support when you need us." style="border:1px solid var(--line);border-radius:10px;padding:10px"/></div>
+          </div>
+        </div>
+
+        <div class="grid2" style="margin-top:14px">
+          <div class="card" style="padding:18px"><h3 style="margin:0">Contact details</h3><p style="color:var(--muted);font-size:13px">Placeholders — add real details before launch.</p>
+            <div class="form-grid" style="margin-top:12px"><div class="field"><label>Phone (placeholder)</label><input value="Add phone number"/></div><div class="field"><label>Email (placeholder)</label><input value="hello@alaura-drift.example"/></div><div class="field"><label>WhatsApp (placeholder)</label><input value="Add WhatsApp number"/></div><div class="field"><label>Business hours</label><input value="Mon–Fri 9am–5pm (placeholder)"/></div></div>
+          </div>
+          <div class="card" style="padding:18px"><h3 style="margin:0">Social links</h3><p style="color:var(--muted);font-size:13px">Paste real profile URLs when ready — placeholders for now.</p>
+            <div style="display:grid;gap:8px;margin-top:12px"><input value="Instagram — add URL" style="border:1px solid var(--line);border-radius:10px;padding:10px"/><input value="Facebook — add URL" style="border:1px solid var(--line);border-radius:10px;padding:10px"/><input value="Pinterest — add URL" style="border:1px solid var(--line);border-radius:10px;padding:10px"/><input value="TikTok — add URL" style="border:1px solid var(--line);border-radius:10px;padding:10px"/></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:18px;margin-top:14px"><h3 style="margin:0">FAQs & Delivery page content</h3><p style="color:var(--muted);font-size:13px">Editable Q&As and delivery information shown on the storefront.</p>
+          <div style="display:grid;gap:10px;margin-top:12px">
+            <div style="border:1px solid var(--line);border-radius:12px;padding:12px"><b style="font-size:13px">How long does delivery take?</b><p style="margin:4px 0 0;color:var(--muted);font-size:13px">Most furniture is delivered within 3–5 working days. You’ll be contacted to arrange a suitable delivery date. (Editable placeholder — confirm before launch.)</p></div>
+            <div style="border:1px solid var(--line);border-radius:12px;padding:12px"><b style="font-size:13px">Do you deliver across the UK?</b><p style="margin:4px 0 0;color:var(--muted);font-size:13px">Yes — UK-wide delivery. Add zones, exclusions and costs in Delivery Settings. (Editable placeholder.)</p></div>
+            <button class="btn" onclick="showToast('Add FAQ — demo')">+ Add FAQ entry</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view" id="view-settings">
+        <div class="page-head"><div><h1>Settings</h1><p>Store configuration. Payment provider is intentionally not connected — ready for integration.</p></div><button class="btn btn-primary" onclick="showToast('Settings saved — demo')">Save settings</button></div>
+        <div class="grid2">
+          <div class="card" style="padding:18px"><h3 style="margin:0">Store details</h3>
+            <div class="form-grid" style="margin-top:14px"><div class="field"><label>Store name</label><input value="ALAURA Drift"/></div><div class="field"><label>Currency</label><select><option>GBP (£) — British Pound</option></select></div><div class="field"><label>VAT rate (%)</label><input value="20"/></div><div class="field"><label>Prices include VAT</label><select><option>Yes — VAT-inclusive pricing</option><option>No</option></select></div><div class="field full"><label>Store email (placeholder)</label><input value="hello@alaura-drift.example"/></div></div>
+          </div>
+          <div class="card" style="padding:18px"><h3 style="margin:0">Payments</h3><p style="color:var(--muted);font-size:13px;line-height:1.5">Connect a legitimate payment provider to take live payments. No fake processing is enabled in this prototype.</p>
+            <div style="border:1.5px dashed var(--line);border-radius:12px;padding:16px;text-align:center;margin-top:12px"><div style="font-size:22px">⬢</div><b>Payment provider</b><div style="color:var(--muted);font-size:13px;margin-top:4px">Status: <span class="pill pill-amber">Not connected — ready for integration</span></div><button class="btn btn-primary" style="margin-top:12px" onclick="showToast('Payment integration — connect Stripe / PayPal in production')">Connect provider</button><p style="font-size:11px;color:var(--muted);margin:10px 0 0">In production, connect Stripe, PayPal or Klarna via their secure onboarding. Card details never touch this dashboard.</p></div>
+          </div>
+        </div>
+        <div class="grid2" style="margin-top:14px">
+          <div class="card" style="padding:18px"><h3 style="margin:0">Notifications</h3>
+            <div class="toggle"><div><b style="font-size:13px">New order emails</b><div style="font-size:12px;color:var(--muted)">Email when a new order is placed</div></div><div class="switch on" onclick="toggleSwitch(this)"></div></div>
+            <div class="toggle"><div><b style="font-size:13px">Low-stock alerts</b><div style="font-size:12px;color:var(--muted)">Notify when stock ≤ 5</div></div><div class="switch on" onclick="toggleSwitch(this)"></div></div>
+            <div class="toggle"><div><b style="font-size:13px">Review moderation alerts</b><div style="font-size:12px;color:var(--muted)">Email for pending reviews</div></div><div class="switch" onclick="toggleSwitch(this)"></div></div>
+          </div>
+          <div class="card" style="padding:18px"><h3 style="margin:0">Staff & roles</h3><p style="color:var(--muted);font-size:13px">Placeholder for team access — invite flow ready to connect.</p>
+            <div style="display:grid;gap:8px;margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px"><div><b style="font-size:13px">Store Owner</b><div style="font-size:12px;color:var(--muted)">owner@alaura-drift.example • Owner</div></div><span class="pill pill-char">Owner</span></div><div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px"><div><b style="font-size:13px">Demo Staff Member</b><div style="font-size:12px;color:var(--muted)">staff@alaura-drift.example • Staff (demo)</div></div><span class="pill pill-grey">Staff</span></div><button class="btn" onclick="showToast('Invite staff — demo only')">+ Invite team member</button></div>
+          </div>
+        </div>
+      </section>
+
+      <p style="text-align:center;color:var(--muted2);font-size:11px;margin:22px 0 6px">ALAURA Drift Admin • Demo data only — front-end prototype structured for a future backend/CMS connection • GBP (£) • UK date format (e.g. 7 Oct 2026)</p>
+    </main>
+  </div>
+</div>
+
+<!-- ORDER DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<aside class="drawer" id="orderDrawer" aria-label="Order details">
+  <div class="drawer-head"><div><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700">Order details • Demo</div><h2 id="drawerOrderNo" style="margin:4px 0 0;font-family:Fraunces,serif;font-size:24px">#AD-10482</h2><div id="drawerMeta" style="color:var(--muted);font-size:13px;margin-top:2px"></div></div><button class="icon-btn" onclick="closeDrawer()">✕</button></div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div style="padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;background:var(--surface)"><button class="btn btn-primary" onclick="showToast('Status updated — demo')">Update status</button><button class="btn" onclick="showToast('Tracking link added — demo')">Add tracking</button><button class="btn" onclick="closeDrawer()">Close</button></div>
+</aside>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productOverlay" onclick="closeProductModal()"></div>
+<div class="modal" id="productModal"><div class="modal-card">
+  <div style="padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><div><h3 style="margin:0;font-family:Fraunces,serif;font-size:22px" id="productModalTitle">Add product</h3><p style="margin:3px 0 0;color:var(--muted);font-size:13px">Same fields as the storefront — demo save only</p></div><button class="icon-btn" onclick="closeProductModal()">✕</button></div>
+  <div style="padding:18px">
+    <div class="form-grid">
+      <div class="field"><label>Product name *</label><input id="pfName" value="Milano Ottoman Bed"/></div>
+      <div class="field"><label>SKU</label><input id="pfSku" value="AD-BED-001"/></div>
+      <div class="field"><label>Category</label><select id="pfCat"><option>Beds</option><option>Sofas</option><option>Mattresses</option><option>Bedroom</option><option>Living Room</option></select></div>
+      <div class="field"><label>Subcategory</label><select><option>Ottoman Beds</option><option>Divan Beds</option><option>Upholstered Beds</option><option>Corner Sofas</option><option>Sofa Beds</option><option>2 Seater Sofas</option></select></div>
+      <div class="field"><label>Price (£)</label><input id="pfPrice" value="649"/></div>
+      <div class="field"><label>Sale price (£)</label><input id="pfSale" value="499"/></div>
+      <div class="field"><label>Stock</label><input id="pfStock" value="14"/></div>
+      <div class="field"><label>Availability</label><select><option>In Stock</option><option>Low Stock</option><option>Out of Stock</option><option>Pre-order</option></select></div>
+      <div class="field full"><label>Short description</label><textarea>Upholstered ottoman bed with gas-lift storage — demo description.</textarea></div>
+      <div class="field full"><label>Full description</label><textarea style="min-height:110px">Detailed product description with materials, comfort and care information. Editable placeholder — replace with final copy before launch.</textarea></div>
+      <div class="field"><label>Width (cm)</label><input value="168"/></div><div class="field"><label>Height (cm)</label><input value="118"/></div>
+      <div class="field"><label>Depth (cm)</label><input value="218"/></div><div class="field"><label>Materials</label><input value="Chenille fabric, solid wood frame"/></div>
+      <div class="field"><label>Colours (comma separated)</label><input value="Oatmeal, Stone Grey, Sage"/></div>
+      <div class="field"><label>Sizes / Variants</label><input value="Single, Double, King, Super King"/></div>
+      <div class="field full"><label>Variant pricing note</label><input value="King +£80 • Super King +£140 (demo per-variant pricing)"/></div>
+      <div class="field"><label>Badges</label><select><option>SALE</option><option>BEST SELLER</option><option>NEW</option><option>LOW STOCK</option><option>None</option></select></div>
+      <div class="field"><label>Images / Gallery</label><input value="Upload images — demo uploader (JPG/WebP)"/></div>
+      <div class="field"><label>SEO title</label><input value="Milano Ottoman Bed | ALAURA Drift"/></div>
+      <div class="field"><label>SEO description</label><input value="Shop the Milano Ottoman Bed with storage. Free UK delivery on selected products."/></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap"><button class="btn" onclick="closeProductModal()">Cancel</button><button class="btn" onclick="showToast('Draft saved — demo')">Save as draft</button><button class="btn btn-primary" onclick="saveProductDemo()">Save product</button></div>
+  </div>
+</div></div>
+
+<!-- DISCOUNT MODAL -->
+<div class="modal-overlay" id="discountOverlay" onclick="closeDiscountModal()"></div>
+<div class="modal" id="discountModal"><div class="modal-card" style="width:min(560px,100%)">
+  <div style="padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:Fraunces,serif;font-size:22px">Create discount</h3><button class="icon-btn" onclick="closeDiscountModal()">✕</button></div>
+  <div style="padding:18px"><div class="form-grid"><div class="field full"><label>Code</label><input value="WELCOME10"/></div><div class="field"><label>Type</label><select><option>Percentage (%)</option><option>Fixed amount (£)</option></select></div><div class="field"><label>Value</label><input value="10"/></div><div class="field"><label>Usage limit</label><input value="100"/></div><div class="field"><label>Expiry date</label><input type="date" value="2026-12-31"/></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" onclick="closeDiscountModal()">Cancel</button><button class="btn btn-primary" onclick="closeDiscountModal();showToast('Discount created — demo')">Create code</button></div></div>
+</div></div>
+
+<!-- CUSTOMER DRAWER uses same drawer -->
+<div class="toast" id="toast"></div>
+
+<script>
+const fmtGBP = n => '£' + Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = d => d; // already UK formatted strings in demo data
+
+const orders = [
+  {id:'AD-10482', customer:'Amelia Hart (Demo)', email:'amelia.demo@example.com', date:'7 Oct 2026', items:2, total:1248, pay:'Paid', fulfil:'Processing', method:'Room of Choice — 2 Person', address:'14 Willow Lane, Leeds, LS8 4QT', phone:'07123 456789 (demo)', lines:[{name:'Milano Ottoman Bed — King, Oatmeal', qty:1, price:899},{name:'Nordic Wool Throw — Stone', qty:1, price:49}], delivery:49, timeline:['Order placed — 7 Oct 2026, 09:42','Payment confirmed — 7 Oct 2026, 09:43','Processing — warehouse picking','Shipped — awaiting','Delivered — pending']},
+  {id:'AD-10481', customer:'James Whitaker (Demo)', email:'james.demo@example.com', date:'6 Oct 2026', items:1, total:749, pay:'Paid', fulfil:'Shipped', method:'Standard UK Delivery', address:'22 Harbour View, Bristol, BS1 5UH', phone:'07234 567890 (demo)', lines:[{name:'Luna Corner Sofa — Left Hand, Stone Grey', qty:1, price:749}], delivery:0, timeline:['Order placed — 6 Oct 2026','Payment confirmed','Processing','Shipped — 7 Oct 2026','Delivered — pending']},
+  {id:'AD-10480', customer:'Priya Nair (Demo)', email:'priya.demo@example.com', date:'6 Oct 2026', items:3, total:412, pay:'Paid', fulfil:'Delivered', method:'Standard UK Delivery', address:'8 Meadow Close, York, YO24 3AB', phone:'07345 678901 (demo)', lines:[{name:'Oslo Chenille Bed — Double', qty:1, price:329},{name:'Mattress Protector', qty:2, price:41.5}], delivery:0, timeline:['Order placed — 2 Oct 2026','Payment confirmed','Processing','Shipped','Delivered — 5 Oct 2026']},
+  {id:'AD-10479', customer:'Oliver Bennett (Demo)', email:'oliver.demo@example.com', date:'5 Oct 2026', items:1, total:1899, pay:'Paid', fulfil:'Pending', method:'Room of Choice + Assembly', address:'31 Kings Road, Brighton, BN1 4AB', phone:'07456 789012 (demo)', lines:[{name:'Verona Chesterfield Sofa — 3 Seater', qty:1, price:1899}], delivery:79, timeline:['Order placed — 5 Oct 2026','Payment confirmed','Processing — pending','Shipped — pending','Delivered — pending']},
+  {id:'AD-10478', customer:'Sofia Ellis (Demo)', email:'sofia.demo@example.com', date:'4 Oct 2026', items:2, total:598, pay:'Refunded', fulfil:'Cancelled', method:'Standard UK Delivery', address:'5 Church Street, Bath, BA1 1AB', phone:'07567 890123 (demo)', lines:[{name:'Kingston Sofa Bed — Double', qty:1, price:549},{name:'Cushion — Sage', qty:1, price:49}], delivery:0, timeline:['Order placed — 4 Oct 2026','Payment confirmed','Cancelled — customer request','Refunded']},
+  {id:'AD-10477', customer:'Ethan Clarke (Demo)', email:'ethan.demo@example.com', date:'3 Oct 2026', items:1, total:449, pay:'Paid', fulfil:'Delivered', method:'Standard UK Delivery', address:'19 Station Road, Manchester, M14 6AB', phone:'07678 901234 (demo)', lines:[{name:'Nordic Bouclé Bed — Double', qty:1, price:449}], delivery:0, timeline:['Order placed — 28 Sep 2026','Payment confirmed','Processing','Shipped','Delivered — 2 Oct 2026']},
+];
+
+const products = [
+  {name:'Milano Ottoman Bed', sku:'AD-BED-001', cat:'Beds', sub:'Ottoman Beds', price:649, sale:499, stock:2, status:'Low Stock', img:'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=200&q=80', badge:'SALE'},
+  {name:'Oslo Chenille Bed', sku:'AD-BED-014', cat:'Beds', sub:'Upholstered Beds', price:429, sale:329, stock:18, status:'Active', img:'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=200&q=80', badge:'BEST SELLER'},
+  {name:'Verona Chesterfield Sofa', sku:'AD-SOF-009', cat:'Sofas', sub:'Chesterfield Sofas', price:2199, sale:1899, stock:6, status:'Active', img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&q=80', badge:''},
+  {name:'Luna Corner Sofa', sku:'AD-SOF-002', cat:'Sofas', sub:'Corner Sofas', price:999, sale:749, stock:4, status:'Low Stock', img:'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=200&q=80', badge:'SALE'},
+  {name:'Nordic Bouclé Bed', sku:'AD-BED-022', cat:'Beds', sub:'Upholstered Beds', price:549, sale:449, stock:0, status:'Out of Stock', img:'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=200&q=80', badge:'NEW'},
+  {name:'Kingston Sofa Bed', sku:'AD-SOF-018', cat:'Sofas', sub:'Sofa Beds', price:699, sale:549, stock:11, status:'Active', img:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&q=80', badge:''},
+  {name:'Hybrid Comfort Mattress — King', sku:'AD-MAT-005', cat:'Mattresses', sub:'Hybrid Mattresses', price:599, sale:449, stock:23, status:'Active', img:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=200&q=80', badge:'BEST SELLER'},
+  {name:'Haven 3-Seater Sofa', sku:'AD-SOF-031', cat:'Sofas', sub:'3 Seater Sofas', price:899, sale:null, stock:9, status:'Draft', img:'https://images.unsplash.com/photo-1567016432779-094069958ea5?w=200&q=80', badge:''},
+];
+
+const categories = [
+  {name:'Beds', parent:'—', count:18, status:'Active', desc:'Modern beds for beautiful bedrooms', subs:'Divan, Ottoman, Upholstered, Storage'},
+  {name:'Ottoman Beds', parent:'Beds', count:6, status:'Active', desc:'Style meets practical storage', subs:''},
+  {name:'Sofas', parent:'—', count:16, status:'Active', desc:'Comfortable sofas for modern living', subs:'Corner, Sofa Beds, Recliner'},
+  {name:'Corner Sofas', parent:'Sofas', count:5, status:'Active', desc:'Create the perfect living space', subs:''},
+  {name:'Sofa Beds', parent:'Sofas', count:4, status:'Active', desc:'Smart comfort for flexible spaces', subs:''},
+  {name:'Mattresses', parent:'—', count:8, status:'Active', desc:'Comfort designed for better sleep', subs:''},
+  {name:'Bedroom', parent:'—', count:12, status:'Active', desc:'Wardrobes, drawers & bedside', subs:''},
+  {name:'Living Room', parent:'—', count:10, status:'Active', desc:'TV units, coffee tables & more', subs:''},
+  {name:'Offers', parent:'—', count:14, status:'Active', desc:'Selected furniture at exceptional prices', subs:''},
+];
+
+const customers = [
+  {name:'Amelia Hart (Demo)', email:'amelia.demo@example.com', orders:4, spent:2846, last:'7 Oct 2026', status:'Active'},
+  {name:'James Whitaker (Demo)', email:'james.demo@example.com', orders:2, spent:1498, last:'6 Oct 2026', status:'Active'},
+  {name:'Priya Nair (Demo)', email:'priya.demo@example.com', orders:6, spent:3120, last:'6 Oct 2026', status:'VIP (Demo)'},
+  {name:'Oliver Bennett (Demo)', email:'oliver.demo@example.com', orders:1, spent:1899, last:'5 Oct 2026', status:'Active'},
+  {name:'Sofia Ellis (Demo)', email:'sofia.demo@example.com', orders:3, spent:1104, last:'4 Oct 2026', status:'Active'},
+];
+
+const reviews = [
+  {name:'Amelia H. (Demo)', product:'Milano Ottoman Bed', rating:5, date:'6 Oct 2026', verified:true, status:'Pending', text:'Beautiful bed and the storage is genuinely useful. Delivery team were polite and took it to the bedroom. Would recommend.'},
+  {name:'James W. (Demo)', product:'Luna Corner Sofa', rating:4, date:'5 Oct 2026', verified:true, status:'Pending', text:'Really comfortable and looks great in stone grey. Took a day longer than estimated but support kept me updated.'},
+  {name:'Priya N. (Demo)', product:'Oslo Chenille Bed', rating:5, date:'4 Oct 2026', verified:true, status:'Approved', text:'Second purchase from ALAURA Drift — quality feels excellent for the price. Assembly was straightforward.'},
+  {name:'Oliver B. (Demo)', product:'Verona Chesterfield Sofa', rating:5, date:'3 Oct 2026', verified:false, status:'Pending', text:'Statement piece for our living room. Fabric feels premium and delivery was well organised. Demo review.'},
+];
+
+const discounts = [
+  {code:'WELCOME10', type:'Percentage', value:'10%', usage:'42 / 100', expires:'31 Dec 2026', status:'Active'},
+  {code:'BEDSALE30', type:'Percentage', value:'30%', usage:'18 / 50', expires:'31 Oct 2026', status:'Active'},
+  {code:'FREEDEL499', type:'Fixed amount', value:'£49 off delivery', usage:'—', expires:'No expiry (demo)', status:'Active'},
+  {code:'AUTUMN20', type:'Percentage', value:'20%', usage:'50 / 50', expires:'30 Sep 2026', status:'Expired'},
+];
+
+function pillFor(s){
+  if(s==='Paid'||s==='Delivered'||s==='Active'||s==='Approved') return 'pill-green';
+  if(s==='Processing'||s==='Shipped'||s==='Pending') return 'pill-amber';
+  if(s==='Cancelled'||s==='Refunded'||s==='Out of Stock'||s==='Rejected') return 'pill-red';
+  if(s==='Low Stock') return 'pill-amber';
+  return 'pill-grey';
+}
+function renderOverviewOrders(){
+  document.getElementById('overviewOrders').innerHTML = orders.slice(0,5).map(o=>`<tr class="clickable" onclick="openOrder('${o.id}')"><td><b>#${o.id}</b></td><td>${o.customer}</td><td>${o.date}</td><td>${o.items} item${o.items>1?'s':''}</td><td><b>${fmtGBP(o.total)}</b></td><td><span class="pill ${pillFor(o.pay)}">${o.pay}</span></td><td><span class="pill ${pillFor(o.fulfil)}">${o.fulfil}</span></td></tr>`).join('');
+}
+function renderOrders(){
+  const q=(document.getElementById('orderSearch')?.value||'').toLowerCase();
+  const f=document.getElementById('orderStatusFilter')?.value||'';
+  const filtered=orders.filter(o=>(!q||o.id.toLowerCase().includes(q)||o.customer.toLowerCase().includes(q))&&(!f||o.fulfil===f));
+  document.getElementById('ordersTable').innerHTML = filtered.map(o=>`<tr class="clickable" onclick="openOrder('${o.id}')"><td><b>#${o.id}</b><div style="font-size:11px;color:var(--muted)">${o.email}</div></td><td>${o.customer}</td><td>${o.date}</td><td>${o.items}</td><td><b>${fmtGBP(o.total)}</b></td><td><span class="pill ${pillFor(o.pay)}">${o.pay}</span></td><td><span class="pill ${pillFor(o.fulfil)}">${o.fulfil}</span></td><td><span style="color:var(--muted)">›</span></td></tr>`).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:22px">No demo orders match your filters.</td></tr>`;
+  document.getElementById('ordersCount').textContent = `Showing ${filtered.length} of ${orders.length} demo orders • GBP (£) • UK dates`;
+}
+function renderProducts(){
+  const q=(document.getElementById('productSearch')?.value||'').toLowerCase();
+  const cat=document.getElementById('productCatFilter')?.value||'';
+  const st=document.getElementById('productStatusFilter')?.value||'';
+  const filtered=products.filter(p=>(!q||p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||p.status===st));
+  document.getElementById('productsTable').innerHTML = filtered.map((p,i)=>`<tr><td><div class="product-cell"><img class="thumb" src="${p.img}" alt="${p.name}"><div><b>${p.name}</b><span>${p.sub} ${p.badge? '• '+p.badge:''}</span></div></div></td><td style="font-family:ui-monospace,monospace;font-size:12px">${p.sku}</td><td>${p.cat}</td><td>${fmtGBP(p.price)}</td><td>${p.sale?fmtGBP(p.sale):'—'}</td><td><b style="color:${p.stock<=2?'var(--red)':p.stock<=5?'var(--amber)':'inherit'}">${p.stock}</b></td><td><span class="pill ${pillFor(p.status)}">${p.status}</span></td><td><button class="btn" style="padding:6px 10px" onclick="openProductModal(${i})">Edit</button></td></tr>`).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:22px">No products found.</td></tr>`;
+}
+function renderCategories(){
+  document.getElementById('categoriesGrid').innerHTML = categories.slice(0,6).map(c=>`<div class="card" style="padding:16px"><div style="display:flex;justify-content:space-between;gap:10px"><b>${c.name}</b><span class="pill pill-grey">${c.count} products</span></div><p style="color:var(--muted);font-size:13px;line-height:1.5;margin:8px 0">${c.desc}</p>${c.subs?`<div style="font-size:12px;color:var(--muted)">Subcategories: ${c.subs}</div>`:''}<div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="padding:7px 10px" onclick="showToast('Edit category — demo')">Edit</button><button class="btn" style="padding:7px 10px" onclick="switchView('products')">View products</button></div></div>`).join('');
+  document.getElementById('categoriesTable').innerHTML = categories.map(c=>`<tr><td><b>${c.name}</b></td><td>${c.parent}</td><td>${c.count}</td><td><span class="pill pill-green">${c.status}</span></td><td><button class="btn" style="padding:6px 10px" onclick="showToast('Edit ${c.name} — demo')">Edit</button></td></tr>`).join('');
+}
+function renderInventory(){
+  const q=(document.getElementById('invSearch')?.value||'').toLowerCase();
+  const f=document.getElementById('invFilter')?.value||'';
+  let list=products.map(p=>({...p, warehouse:'UK Warehouse — Leeds (Demo)', reserved: Math.max(0, Math.min(3, Math.floor(p.stock/4)))}));
+  if(q) list=list.filter(p=>p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q));
+  if(f==='low') list=list.filter(p=>p.stock>0&&p.stock<=5);
+  if(f==='out') list=list.filter(p=>p.stock===0);
+  if(f==='ok') list=list.filter(p=>p.stock>5);
+  document.getElementById('inventoryTable').innerHTML = list.map((p,i)=>`<tr><td><div class="product-cell"><img class="thumb" src="${p.img}" alt=""><div><b>${p.name}</b><span>${p.cat} • ${p.sub}</span></div></div></td><td style="font-family:ui-monospace,monospace;font-size:12px">${p.sku}</td><td style="font-size:12px;color:var(--muted)">${p.warehouse}</td><td><b>${p.stock}</b></td><td>${p.reserved}</td><td><span class="pill ${p.stock===0?'pill-red':p.stock<=5?'pill-amber':'pill-green'}">${p.stock===0?'Out of stock':p.stock<=5?'Low stock':'In stock'}</span></td><td><div style="display:flex;gap:6px;align-items:center"><button class="btn" style="padding:6px 9px" onclick="adjustStock(${i},-1)">−</button><span style="min-width:22px;text-align:center;font-weight:700">${p.stock}</span><button class="btn" style="padding:6px 9px" onclick="adjustStock(${i},1)">+</button></div></td></tr>`).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No inventory matches.</td></tr>`;
+}
+function adjustStock(idx,delta){
+  // demo only — find by rendered order is approximate; just toast
+  showToast(delta>0?'Stock increased by 1 — demo':'Stock decreased by 1 — demo');
+}
+function renderCustomers(){
+  const q=(document.getElementById('custSearch')?.value||'').toLowerCase();
+  const list=customers.filter(c=>!q||c.name.toLowerCase().includes(q)||c.email.toLowerCase().includes(q));
+  document.getElementById('customersTable').innerHTML = list.map((c,i)=>`<tr class="clickable" onclick="openCustomer(${i})"><td><div style="display:flex;gap:10px;align-items:center"><div class="avatar" style="width:34px;height:34px;font-size:11px">${c.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</div><b>${c.name}</b></div></td><td style="color:var(--muted)">${c.email}</td><td>${c.orders}</td><td><b>${fmtGBP(c.spent)}</b></td><td>${c.last}</td><td><span class="pill ${c.status.includes('VIP')?'pill-char':'pill-green'}">${c.status}</span></td></tr>`).join('');
+}
+function renderReviews(){
+  document.getElementById('reviewsList').innerHTML = reviews.map((r,i)=>`<div class="card" style="padding:16px" id="review-${i}"><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between"><div><b>${r.name}</b> <span style="color:var(--muted);font-size:12px">on ${r.product} • ${r.date}</span> ${r.verified?'<span class="pill pill-green">✓ Verified purchase (demo)</span>':''} <span class="pill ${pillFor(r.status)}">${r.status}</span></div><div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)} <span style="color:var(--muted);font-size:12px">${r.rating}.0</span></div></div><p style="color:var(--muted);line-height:1.6;margin:10px 0">${r.text}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" style="padding:7px 11px" onclick="moderateReview(${i},'Approved')">✓ Approve</button><button class="btn" style="padding:7px 11px" onclick="moderateReview(${i},'Rejected')">Reject</button><button class="btn" style="padding:7px 11px" onclick="showToast('Reply box — demo: Thank you for your review!')">↩ Reply</button></div></div>`).join('');
+}
+function moderateReview(i,status){ reviews[i].status=status; renderReviews(); showToast(`Review ${status.toLowerCase()} — demo`); }
+function renderDiscounts(){
+  document.getElementById('discountsTable').innerHTML = discounts.map(d=>`<tr><td><b style="font-family:ui-monospace,monospace">${d.code}</b></td><td>${d.type}</td><td><b>${d.value}</b></td><td>${d.usage}</td><td>${d.expires}</td><td><span class="pill ${d.status==='Active'?'pill-green':'pill-grey'}">${d.status}</span></td><td><button class="btn" style="padding:6px 10px" onclick="showToast('Edit discount — demo')">Edit</button></td></tr>`).join('');
+}
+function renderZones(){
+  const zones=[
+    {name:'England — Standard', cost:'£29 – £49 (or FREE over £499 on selected products)', time:'3–5 working days'},
+    {name:'Scotland — Highlands & Islands', cost:'£49 – £79', time:'5–7 working days'},
+    {name:'Wales', cost:'£29 – £49', time:'3–5 working days'},
+    {name:'Northern Ireland', cost:'£59', time:'5–7 working days'},
+  ];
+  document.getElementById('zones').innerHTML = zones.map(z=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b style="font-size:13px">${z.name}</b><span class="pill pill-grey">${z.time}</span></div><div style="font-size:13px;color:var(--muted);margin-top:4px">${z.cost} • Demo pricing — edit before launch</div><div style="display:flex;gap:8px;margin-top:10px"><input value="${z.cost.split('—')[0].trim()}" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:8px" aria-label="Cost"><button class="btn" style="padding:7px 10px" onclick="showToast('Zone saved — demo')">Save</button></div></div>`).join('');
+}
+
+// NAV
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.view===name));
+  closeSidebar();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('nav').addEventListener('click', e=>{
+  const item=e.target.closest('.nav-item'); if(!item) return; switchView(item.dataset.view);
+});
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('scrim').classList.add('open'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('scrim').classList.remove('open'); }
+
+// ORDER DRAWER
+function openOrder(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  document.getElementById('drawerOrderNo').textContent='#'+o.id;
+  document.getElementById('drawerMeta').textContent=`${o.date} • ${o.customer} • ${o.method}`;
+  const subtotal=o.lines.reduce((s,l)=>s+l.price*l.qty,0);
+  document.getElementById('drawerBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700">Customer (Demo)</div><b style="display:block;margin-top:6px">${o.customer}</b><div style="font-size:13px;color:var(--muted);line-height:1.5">${o.email}<br>${o.phone}</div></div>
+      <div style="border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700">Delivery address</div><div style="font-size:13px;line-height:1.6;margin-top:6px">${o.address.replace(', ','<br>')}</div><div style="font-size:12px;color:var(--muted);margin-top:4px">UK postcode format • Demo address</div></div>
+    </div>
+    <div style="margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden"><div style="padding:12px 14px;background:var(--surface2);font-weight:700;font-size:13px">Items</div>${o.lines.map(l=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:11px 14px;border-top:1px solid var(--line2)"><div><b style="font-size:13px">${l.name}</b><div style="font-size:12px;color:var(--muted)">Qty ${l.qty}</div></div><b>${fmtGBP(l.price*l.qty)}</b></div>`).join('')}<div style="padding:11px 14px;border-top:1px solid var(--line2);font-size:13px;color:var(--muted)"><div style="display:flex;justify-content:space-between"><span>Subtotal</span><span>${fmtGBP(subtotal)}</span></div><div style="display:flex;justify-content:space-between;margin-top:4px"><span>Delivery (${o.method})</span><span>${o.delivery?fmtGBP(o.delivery):'FREE'}</span></div><div style="display:flex;justify-content:space-between;margin-top:8px;color:var(--text);font-weight:700;font-size:15px"><span>Total (GBP, VAT incl.)</span><span>${fmtGBP(o.total)}</span></div></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><span class="pill ${pillFor(o.pay)}">Payment: ${o.pay}</span><span class="pill ${pillFor(o.fulfil)}">Fulfilment: ${o.fulfil}</span><span class="pill pill-grey">${o.method}</span></div>
+    <h4 style="margin:18px 0 10px">Status timeline</h4>
+    <div class="timeline">${o.timeline.map((t,i)=>`<div class="tl"><div class="tl-dot ${i<3?'done':''}"><span></span>${i<o.timeline.length-1?'<div class="tl-line"></div>':''}</div><div style="padding-bottom:14px"><b style="font-size:13px">${t.split(' — ')[0]}</b><div style="font-size:12px;color:var(--muted)">${t.includes(' — ')?t.split(' — ')[1]:''}</div></div></div>`).join('')}</div>
+    <div style="border:1px solid var(--line);border-radius:12px;padding:12px"><label style="font-size:12px;font-weight:700">Update fulfilment status</label><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><select id="drawerStatus" style="flex:1;border:1px solid var(--line);border-radius:999px;padding:9px 11px"><option ${o.fulfil==='Pending'?'selected':''}>Pending</option><option ${o.fulfil==='Processing'?'selected':''}>Processing</option><option ${o.fulfil==='Shipped'?'selected':''}>Shipped</option><option ${o.fulfil==='Delivered'?'selected':''}>Delivered</option><option ${o.fulfil==='Cancelled'?'selected':''}>Cancelled</option></select><button class="btn btn-primary" onclick="showToast('Order status updated to '+document.getElementById('drawerStatus').value+' — demo')">Save</button></div><label style="font-size:12px;font-weight:700;display:block;margin-top:12px">Tracking number / link</label><div style="display:flex;gap:8px;margin-top:6px"><input placeholder="e.g. UK123456789 (demo)" style="flex:1;border:1px solid var(--line);border-radius:999px;padding:9px 11px"/><button class="btn" onclick="showToast('Tracking saved & customer notified — demo')">Add tracking</button></div></div>
+  `;
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('orderDrawer').classList.add('open');
+}
+function closeDrawer(){ document.getElementById('drawerOverlay').classList.remove('open'); document.getElementById('orderDrawer').classList.remove('open'); }
+function openCustomer(idx){
+  const c=customers[idx]; const custOrders=orders.filter(o=>o.customer.startsWith(c.name.split(' (')[0]));
+  document.getElementById('drawerOrderNo').textContent=c.name;
+  document.getElementById('drawerMeta').textContent=`${c.email} • ${c.orders} orders • ${fmtGBP(c.spent)} total spent (demo)`;
+  document.getElementById('drawerBody').innerHTML=`<div style="border:1px solid var(--line);border-radius:12px;padding:14px"><b>Customer details (Demo)</b><p style="color:var(--muted);font-size:13px;line-height:1.6;margin:8px 0 0">${c.email}<br>Status: ${c.status}<br>Last order: ${c.last}<br><br>Demo record only — no real personal data. In production this would show saved addresses, wishlist and account details.</p></div><h4 style="margin:16px 0 8px">Order history</h4>${(custOrders.length?custOrders:orders.slice(0,2)).map(o=>`<div style="display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:8px;cursor:pointer" onclick="openOrder('${o.id}')"><div><b>#${o.id}</b><div style="font-size:12px;color:var(--muted)">${o.date} • ${o.items} items</div></div><div style="text-align:right"><b>${fmtGBP(o.total)}</b><div><span class="pill ${pillFor(o.fulfil)}">${o.fulfil}</span></div></div></div>`).join('')}`;
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('orderDrawer').classList.add('open');
+}
+
+// PRODUCT MODAL
+function openProductModal(idx){
+  if(typeof idx==='number'){ const p=products[idx]; document.getElementById('productModalTitle').textContent='Edit product'; document.getElementById('pfName').value=p.name; document.getElementById('pfSku').value=p.sku; document.getElementById('pfPrice').value=p.price; document.getElementById('pfSale').value=p.sale||''; document.getElementById('pfStock').value=p.stock; }
+  else { document.getElementById('productModalTitle').textContent='Add product'; }
+  document.getElementById('productOverlay').classList.add('open'); document.getElementById('productModal').classList.add('open');
+}
+function closeProductModal(){ document.getElementById('productOverlay').classList.remove('open'); document.getElementById('productModal').classList.remove('open'); }
+function saveProductDemo(){ closeProductModal(); showToast('Product saved — demo (would publish to storefront)'); renderProducts(); }
+function openDiscountModal(){ document.getElementById('discountOverlay').classList.add('open'); document.getElementById('discountModal').classList.add('open'); }
+function closeDiscountModal(){ document.getElementById('discountOverlay').classList.remove('open'); document.getElementById('discountModal').classList.remove('open'); }
+function toggleSwitch(el){ el.classList.toggle('on'); showToast(el.classList.contains('on')?'Setting enabled — demo':'Setting disabled — demo'); }
+let toastTimer;
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2600); }
+
+// Global search (demo) — jumps to orders/products
+document.getElementById('globalSearch').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ const v=e.target.value.toLowerCase(); if(v.includes('order')||v.startsWith('ad-')) switchView('orders'); else if(v) switchView('products'); showToast('Demo search: “'+e.target.value+'”'); }
+});
+
+// Init
+renderOverviewOrders(); renderOrders(); renderProducts(); renderCategories(); renderInventory(); renderCustomers(); renderReviews(); renderDiscounts(); renderZones();
+</script>
+</body>
+</html>
