@@ -420,6 +420,47 @@ var FAQS = [
   {g:"Payments", q:"Which payment methods are accepted?", a:"Payments are taken securely through our payment provider at checkout. Accepted card and wallet options are shown on the payment step."},
   {g:"Payments", q:"Is payment secure?", a:"Yes. Card details are entered directly with our PCI-compliant payment provider and are never stored on this website."}
 ];
+
+/* Store Admin sync — catalogue managed in admin.html (same browser) overrides the built-in seed */
+(function(){
+  function catKey(cat){ return String(cat||'').toLowerCase().replace(/[^a-z]/g,'') || 'all'; }
+  function storeBadge(b){ return ({'SALE':'Sale','NEW':'New','BEST SELLER':'Best Seller','LOW STOCK':'Low Stock'}[b] || ''); }
+  function parseVariants(variants, note){
+    var list = String(variants||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var sizes = {}; (list.length?list:['Standard']).forEach(function(v){ sizes[v]=0; });
+    String(note||'').split(/[\u2022\n]/).forEach(function(part){
+      var m = part.match(/([A-Za-z][A-Za-z \-]*?)\s*\+\s*\u00a3\s*([\d,]+(?:\.\d+)?)/);
+      if(m){ sizes[m[1].trim()] = parseFloat(m[2].replace(/,/g,'')); }
+    });
+    return sizes;
+  }
+  function toStoreProduct(p){
+    var colours = String(p.colours||'').split(',').map(function(c){return c.trim();}).filter(Boolean);
+    if(!colours.length) colours = ['Natural'];
+    var eff = (p.sale!=null && !isNaN(p.sale)) ? p.sale : p.price;
+    var was = (p.sale!=null && !isNaN(p.sale) && p.sale < p.price) ? p.price : null;
+    return {
+      slug: p.slug, name: p.name, sku: p.sku,
+      cat: catKey(p.cat), type: p.sub || p.cat,
+      price: eff, was: was,
+      rating: p.rating || 4.5, reviews: p.reviews || 0,
+      badge: storeBadge(p.badge), stock: (p.stock==null?10:p.stock),
+      img: p.img, colours: colours, sizes: parseVariants(p.variants, p.variantNote),
+      blurb: p.short || '', desc: p.full || '',
+      dims: p.dims || '', materials: p.materials || '', features: p.features || []
+    };
+  }
+  try{
+    var raw = localStorage.getItem('alaura_store_products_v1');
+    if(raw){
+      var d = JSON.parse(raw);
+      if(d && d.v===1 && Array.isArray(d.products) && d.products.length){
+        PRODUCTS = d.products.filter(function(p){ return p.status !== 'Draft'; }).map(toStoreProduct);
+      }
+    }
+  }catch(e){ /* keep built-in catalogue */ }
+})();
+
 var SAMPLE_REVIEWS = [
   {name:"Charlotte", stars:5, date:"12 September 2026", text:"The bed looks even better in person and feels really sturdy. Delivery was arranged around my work hours, which I appreciated.", verified:true},
   {name:"James", stars:5, date:"28 August 2026", text:"Sofa is deep, comfortable and the fabric has worn well with two kids so far. Would buy from here again.", verified:true},
