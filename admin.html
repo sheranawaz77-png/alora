@@ -430,6 +430,17 @@ tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--surface2)}
 </div></div>
 
 <!-- CUSTOMER DRAWER uses same drawer -->
+<!-- CONFIRM MODAL (replaces native confirm()) -->
+<div class="modal-overlay" id="confirmOverlay" onclick="closeConfirm()"></div>
+<div class="modal" id="confirmModal"><div class="modal-card" style="width:min(440px,100%)">
+  <div style="padding:20px 20px 16px"><h3 style="margin:0;font-family:Fraunces,serif;font-size:20px">Please confirm</h3>
+  <p id="confirmMsg" style="color:var(--muted);font-size:14px;line-height:1.6;margin:8px 0 0"></p></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;padding:0 20px 20px;flex-wrap:wrap">
+    <button class="btn" onclick="closeConfirm()">Cancel</button>
+    <button class="btn" id="confirmYesBtn" style="background:var(--red);border-color:var(--red);color:#fff" onclick="doConfirm()">Delete</button>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -758,11 +769,12 @@ function saveProducts(){
 }
 function publishToStore(){ return saveProducts(); /* storefront reads LS_STORE_KEY directly */ }
 function resetDemoProducts(){
-  if(!confirm('Reset all products to the original demo data? Your changes will be lost.')) return;
+  askConfirm('Reset all products to the original demo data? Your changes will be lost.', 'Reset', function(){
   products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
   try{ localStorage.setItem(LS_STORE_KEY, JSON.stringify({v:1, updated:Date.now(), products:products})); }catch(e){}
   renderProducts(); renderInventory();
   showToast('Products reset to demo data — storefront updated');
+  });
 }
 function uniqueSlug(name, selfId){
   const base = slugify(name); let s = base, n = 2;
@@ -1068,16 +1080,31 @@ function saveProduct(){
 }
 function deleteProduct(id){
   const p=products.find(x=>x.id===id); if(!p) return;
-  if(!confirm('Delete "'+p.name+'"? This cannot be undone.')) return;
-  products=products.filter(x=>x.id!==id);
-  closeProductModal();
-  if(saveProducts()){ publishToStore(); renderProducts(); renderInventory(); }
-  showToast('Product deleted — removed from the storefront');
+  askConfirm('Delete \u201c'+p.name+'\u201d? This will also remove it from the storefront. This cannot be undone.', 'Delete', function(){
+    products=products.filter(x=>x.id!==id);
+    closeProductModal();
+    if(saveProducts()){ publishToStore(); renderProducts(); renderInventory(); }
+    showToast('Product deleted \u2014 removed from the storefront');
+  });
 }
 function deleteEditingProduct(){ if(editingId) deleteProduct(editingId); }
 function openDiscountModal(){ document.getElementById('discountOverlay').classList.add('open'); document.getElementById('discountModal').classList.add('open'); }
 function closeDiscountModal(){ document.getElementById('discountOverlay').classList.remove('open'); document.getElementById('discountModal').classList.remove('open'); }
 function toggleSwitch(el){ el.classList.toggle('on'); showToast(el.classList.contains('on')?'Setting enabled — demo':'Setting disabled — demo'); }
+let confirmCb = null;
+function askConfirm(msg, yesLabel, cb){
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmYesBtn').textContent = yesLabel || 'Confirm';
+  confirmCb = cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirmOverlay').classList.remove('open');
+  document.getElementById('confirmModal').classList.remove('open');
+  confirmCb = null;
+}
+function doConfirm(){ const cb = confirmCb; closeConfirm(); if(cb) cb(); }
 let toastTimer;
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2600); }
 
